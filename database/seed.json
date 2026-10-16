@@ -1,0 +1,11 @@
+{
+  "products": [
+    {"id": "entier",    "name": "Poulet fermier entier",              "price": 4500},
+    {"id": "decoupe",   "name": "Poulet fermier découpé",             "price": 5000},
+    {"id": "evenement", "name": "Poulet fumé / braisé événementiel",  "price": 6000},
+    {"id": "oeufs",     "name": "Œufs fermiers (plateau de 30)",      "price": 3000}
+  ],
+  "stock":      {"entier": 120, "decoupe": 60, "evenement": 40, "oeufs": 80},
+  "thresholds": {"entier": 20,  "decoupe": 15, "evenement": 10, "oeufs": 20},
+  "orders": []
+}

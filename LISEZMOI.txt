@@ -1,0 +1,15 @@
+IHAN Volailles — structure du projet
+
+index.html          Site de vente (panier, formulaire de livraison, WhatsApp, carte)
+dashboard.html      Tableau de bord : commandes + stock (lié au site)
+assets/images/      Vos photos (ferme-1.jpg…, entier-1.jpg…) — voir LISEZMOI.txt dedans
+assets/icons/       favicon.ico + favicon-64.png (logo de l'entête)
+api/ihan-api.js     Accès aux données partagé par le site et le dashboard
+database/schema.sql Schéma SQL pour une vraie base (PostgreSQL / Supabase)
+database/seed.json  Produits, stock et seuils de départ
+
+Important : index.html et dashboard.html doivent rester dans le même dossier
+et sur le même domaine : ils partagent les données via api/ihan-api.js.
+Pour l'instant les données sont dans le navigateur (localStorage) : le dashboard
+ne voit que les commandes passées depuis CE navigateur. Pour recevoir les
+commandes de tous les clients, il faut brancher la base (schema.sql).

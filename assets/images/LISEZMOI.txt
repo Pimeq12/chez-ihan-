@@ -1,0 +1,8 @@
+Déposez ici vos vraies photos (JPG). Tant qu'une photo manque, une illustration la remplace.
+
+Ferme (carrousel)      : ferme-1.jpg, ferme-2.jpg, ferme-3.jpg, ferme-4.jpg, ferme-5.jpg
+Poulet entier          : entier-1.jpg, entier-2.jpg, entier-3.jpg
+Poulet découpé         : decoupe-1.jpg, decoupe-2.jpg, decoupe-3.jpg
+Poulet fumé/braisé     : evenement-1.jpg, evenement-2.jpg, evenement-3.jpg
+Oeufs                  : oeufs-1.jpg, oeufs-2.jpg, oeufs-3.jpg
+(-1 = image de la carte produit ; -1, -2, -3 = galerie de la fiche produit)

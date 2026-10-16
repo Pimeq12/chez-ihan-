@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Tableau de bord — IHAN Volailles</title>
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --terracotta:#8F2E12; --terracotta-l:#C1481E; --gold:#D89A3E; --gold-l:#F0C572;
+  --cream:#FBF3E4; --brown:#3A2318; --charcoal:#2B2B2B; --white:#fff; --muted:#8a7768;
+  --ok:#2F7D4A; --warn:#C77A0A; --bad:#B3261E; --info:#2A6F97;
+  --font-display:'Playfair Display', Georgia, serif; --font-body:'Inter', Arial, sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:var(--font-body); background:var(--cream); color:var(--charcoal); line-height:1.5; font-size:14.5px;}
+h1,h2,h3{font-family:var(--font-display); color:var(--terracotta); line-height:1.2;}
+button,input,select{font-family:inherit;}
+:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+a{color:inherit;}
+
+/* header */
+.top{position:sticky; top:0; z-index:20; background:rgba(251,243,228,.96); backdrop-filter:blur(6px); border-bottom:1px solid rgba(216,154,62,.4);}
+.top-in{max-width:1280px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:20px; color:var(--terracotta); text-decoration:none;}
+.brand img{width:34px; height:34px; border-radius:7px;}
+.brand small{font:500 13px var(--font-body); color:var(--muted); margin-left:4px;}
+.spacer{flex:1;}
+.btn{display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:3px; border:1.5px solid var(--gold); background:none; color:var(--terracotta); font-weight:600; font-size:13px; cursor:pointer; text-decoration:none;}
+.btn:hover{background:var(--gold); color:#fff;}
+.btn.primary{background:var(--terracotta); border-color:var(--terracotta); color:var(--cream);}
+.btn.primary:hover{background:var(--terracotta-l);}
+.btn.sm{padding:5px 10px; font-size:12px;}
+.btn.danger{border-color:var(--bad); color:var(--bad);}
+.btn.danger:hover{background:var(--bad); color:#fff;}
+
+main{max-width:1280px; margin:0 auto; padding:24px;}
+.bar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;}
+.bar h1{font-size:28px; margin-right:auto;}
+.seg{display:inline-flex; border:1.5px solid var(--gold); border-radius:3px; overflow:hidden;}
+.seg button{border:none; background:none; padding:8px 14px; font-weight:600; font-size:13px; color:var(--brown); cursor:pointer;}
+.seg button.on{background:var(--terracotta); color:var(--cream);}
+
+/* alerte stock */
+.alert{display:none; background:#FFF1D6; border:1px solid var(--gold); border-left:5px solid var(--warn); padding:12px 16px; border-radius:4px; margin-bottom:18px; font-weight:500;}
+.alert.show{display:block;}
+.alert.crit{background:#FDE7E4; border-color:var(--bad); border-left-color:var(--bad);}
+
+/* KPI */
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:22px;}
+.kpi{background:var(--white); border-radius:6px; padding:18px 20px; border-top:4px solid var(--gold); box-shadow:0 10px 26px -18px rgba(58,35,24,.35);}
+.kpi span{font-size:12.5px; color:var(--muted); font-weight:600; display:block;}
+.kpi b{font-family:var(--font-display); font-size:30px; color:var(--terracotta); display:block; line-height:1.2; margin-top:4px;}
+.kpi small{color:var(--muted); font-size:12px;}
+
+.card{background:var(--white); border-radius:6px; padding:20px 22px; box-shadow:0 10px 26px -18px rgba(58,35,24,.35); margin-bottom:22px;}
+.card h2{font-size:20px; margin-bottom:4px;}
+.card .sub{color:var(--muted); font-size:13px; margin-bottom:14px;}
+.card-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.grid3{display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:22px;}
+.grid3 .card{margin-bottom:0;}
+.wrap-x{overflow-x:auto;}
+
+/* graphiques */
+.hbar{margin-bottom:12px;}
+.hbar .l{display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; gap:8px;}
+.hbar .l b{font-weight:600; color:var(--brown);}
+.track{height:10px; background:var(--cream); border-radius:6px; overflow:hidden;}
+.fill{height:100%; background:linear-gradient(90deg,var(--terracotta),var(--gold)); border-radius:6px; min-width:2px;}
+.cols{display:flex; align-items:flex-end; gap:10px; height:150px; padding-top:10px;}
+.col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:5px;}
+.col i{width:100%; max-width:38px; background:var(--terracotta); border-radius:3px 3px 0 0; min-height:2px; font-style:normal;}
+.col em{font-style:normal; font-size:11.5px; color:var(--muted);}
+.col b{font-size:12px; color:var(--brown);}
+.empty{color:var(--muted); font-size:13px; padding:10px 0;}
+
+/* tables */
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th{text-align:left; font-size:12px; color:var(--muted); font-weight:600; padding:9px 10px; border-bottom:2px solid rgba(216,154,62,.5); white-space:nowrap;}
+td{padding:11px 10px; border-bottom:1px solid rgba(216,154,62,.25); vertical-align:middle;}
+tr.det td{background:#FFFAF0; font-size:13px; color:#5c4a3d;}
+td.num, th.num{text-align:right; white-space:nowrap;}
+.pill{display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700;}
+.p-ok{background:#E2F2E8; color:var(--ok);} .p-warn{background:#FFEBC8; color:var(--warn);} .p-bad{background:#FADAD7; color:var(--bad);}
+.s-Nouvelle{background:#DCEBF5; color:var(--info);} .s-Confirmée{background:#FFEBC8; color:var(--warn);}
+.s-En-livraison{background:#EBDDF5; color:#6B3FA0;} .s-Livrée{background:#E2F2E8; color:var(--ok);} .s-Annulée{background:#EEE; color:#777;}
+.stk{display:flex; align-items:center; gap:6px;}
+.stk input{width:76px; padding:6px 8px; border:1px solid rgba(143,46,18,.3); border-radius:3px; font-weight:700; text-align:right;}
+.stk button{width:30px; height:30px; border-radius:50%; border:1px solid var(--gold); background:none; color:var(--terracotta); font-weight:700; cursor:pointer;}
+.stk button.wide{width:auto; border-radius:3px; padding:0 8px; font-size:12px;}
+.stk button:hover{background:var(--gold); color:#fff;}
+.thr{width:62px; padding:6px 8px; border:1px solid rgba(143,46,18,.3); border-radius:3px; text-align:right;}
+select.st{padding:6px 8px; border:1px solid rgba(143,46,18,.3); border-radius:3px; background:#fff; font-weight:600; font-size:13px;}
+.filters{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+.filters input, .filters select{padding:8px 12px; border:1px solid rgba(143,46,18,.3); border-radius:3px; background:#fff; font-size:13.5px;}
+.filters input{min-width:240px;}
+.demo{font-size:11px; font-weight:700; color:var(--muted); border:1px dashed var(--muted); border-radius:3px; padding:0 5px; margin-left:6px;}
+.note{font-size:12.5px; color:var(--muted); padding:6px 0 30px; text-align:center;}
+.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--terracotta); color:var(--cream); padding:12px 22px; border-radius:4px; font-weight:600; opacity:0; transition:.3s; pointer-events:none; z-index:50;}
+.toast.show{opacity:1;}
+
+@media(max-width:1000px){ .kpis{grid-template-columns:repeat(2,1fr);} .grid3{grid-template-columns:1fr;} .grid3 .card{margin-bottom:0;} }
+@media(max-width:560px){ .kpis{grid-template-columns:1fr;} main{padding:16px;} .bar h1{font-size:23px;} .filters input{min-width:0; width:100%;} }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="index.html"><img src="assets/icons/favicon-64.png" alt="">IHAN <small>Tableau de bord</small></a>
+  <span class="spacer"></span>
+  <button class="btn" id="btnCsv">Exporter les commandes (CSV)</button>
+  <a class="btn primary" href="index.html">Voir le site</a>
+</div></header>
+
+<main>
+  <div class="bar">
+    <h1>Commandes et stock</h1>
+    <div class="seg" role="group" aria-label="Période" id="period">
+      <button data-p="1">Aujourd'hui</button><button data-p="7" class="on">7 jours</button><button data-p="30">30 jours</button><button data-p="0">Tout</button>
+    </div>
+  </div>
+
+  <div class="alert" id="alert" role="alert"></div>
+
+  <section class="kpis" aria-label="Indicateurs clés">
+    <div class="kpi"><span>Commandes</span><b id="kOrders">0</b><small id="kOrdersSub"></small></div>
+    <div class="kpi"><span>Chiffre d'affaires</span><b id="kRev">0</b><small>Commandes non annulées</small></div>
+    <div class="kpi"><span>À traiter</span><b id="kTodo">0</b><small>Nouvelles, confirmées, en livraison</small></div>
+    <div class="kpi"><span>Panier moyen</span><b id="kAvg">0</b><small>Sur la période</small></div>
+  </section>
+
+  <section class="grid3" style="margin-bottom:22px;" aria-label="Graphiques">
+    <div class="card"><h2>Commandes par jour</h2><p class="sub">7 derniers jours</p><div class="cols" id="chDays"></div></div>
+    <div class="card"><h2>Ventes par produit</h2><p class="sub">Chiffre d'affaires de la période</p><div id="chProd"></div></div>
+    <div class="card"><h2>Communes</h2><p class="sub">Nombre de commandes de la période</p><div id="chZone"></div></div>
+  </section>
+
+  <section class="card" aria-labelledby="hStock">
+    <div class="card-head"><div><h2 id="hStock">Stock disponible</h2>
+      <p class="sub">Le site déduit automatiquement chaque commande du stock. Modifiez une quantité pour réapprovisionner : le site l'affiche aussitôt.</p></div></div>
+    <div class="wrap-x"><table>
+      <thead><tr><th>Produit</th><th>Quantité en stock</th><th class="num">Seuil d'alerte</th><th>État</th><th class="num">Vendu (période)</th><th class="num">Autonomie</th><th class="num">Valeur du stock</th></tr></thead>
+      <tbody id="stockBody"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card" aria-labelledby="hOrders">
+    <div class="card-head"><div><h2 id="hOrders">Commandes</h2><p class="sub">Changez le statut au fil de la préparation. Une commande annulée remet ses produits en stock.</p></div></div>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Rechercher : nom, téléphone, n° de commande…" aria-label="Rechercher une commande">
+      <select id="fStatus" aria-label="Filtrer par statut"><option value="">Tous les statuts</option></select>
+    </div>
+    <div class="wrap-x"><table>
+      <thead><tr><th>N°</th><th>Reçue le</th><th>Client</th><th>Commune</th><th>Articles</th><th class="num">Total</th><th>Livraison</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody id="orderBody"></tbody>
+    </table></div>
+    <div class="empty" id="orderEmpty" hidden>Aucune commande pour ces critères. Les commandes passées sur le site apparaîtront ici.</div>
+  </section>
+
+  <div class="card" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+    <div style="flex:1; min-width:240px;"><h2 style="font-size:17px;">Données de démonstration</h2><p class="sub" style="margin:0;">Pour voir le tableau de bord rempli avant vos premières commandes. Elles ne modifient pas le stock.</p></div>
+    <button class="btn" id="btnDemo">Ajouter des commandes de démo</button>
+    <button class="btn danger" id="btnClearDemo">Supprimer la démo</button>
+  </div>
+  <p class="note">Les commandes et le stock sont enregistrés dans le navigateur de cet appareil et partagés avec le site s'il est ouvert depuis le même dossier ou le même domaine.</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="api/ihan-api.js"></script>
+<script>
+const KEY_STOCK="ihan_stock_v1", KEY_ORDERS="ihan_orders_v1", KEY_META="ihan_dash_meta_v1";
+const DEFAULT_STOCK={entier:120, decoupe:60, evenement:40, oeufs:80};
+const DEFAULT_THR={entier:20, decoupe:15, evenement:10, oeufs:20};
+const PRODUCTS=[
+  {id:"entier", name:"Poulet fermier entier", price:4500},
+  {id:"decoupe", name:"Poulet fermier découpé", price:5000},
+  {id:"evenement", name:"Poulet fumé / braisé événementiel", price:6000},
+  {id:"oeufs", name:"Œufs fermiers (plateau de 30)", price:3000},
+];
+const STATUSES=["Nouvelle","Confirmée","En livraison","Livrée","Annulée"];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fcfa=n=>Math.round(n).toLocaleString("fr-FR")+" FCFA";
+const load=IhanAPI.load, save=IhanAPI.save;
+const getStock=()=>({...DEFAULT_STOCK,...load(KEY_STOCK,{})});
+const getThr=()=>({...DEFAULT_THR,...load(KEY_META,{})});
+const getOrders=()=>load(KEY_ORDERS,[]);
+let period=7, open=new Set();
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+const dayKey=d=>{d=new Date(d);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+const fmtDT=iso=>new Date(iso).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+const fmtD=s=>{const [y,m,d]=s.split("-");return `${d}/${m}/${y}`;};
+function inPeriod(o){ if(!period) return true; const since=new Date(); since.setHours(0,0,0,0); since.setDate(since.getDate()-(period-1)); return new Date(o.createdAt)>=since; }
+function waPhone(p){ const d=String(p).replace(/\D/g,""); return d.length===10 ? "225"+d : d; }
+
+/* ---------- actions ---------- */
+function setStock(id,q){ const s=getStock(); s[id]=Math.max(0,Math.round(Number(q)||0)); save(KEY_STOCK,s); renderAll(); }
+function addStock(id,d){ const s=getStock(); setStock(id,(s[id]||0)+d); }
+function setThr(id,v){ const m=load(KEY_META,{}); m[id]=Math.max(0,Math.round(Number(v)||0)); save(KEY_META,m); renderAll(); }
+function setStatus(oid,st){
+  const orders=getOrders(), o=orders.find(x=>x.id===oid); if(!o) return;
+  const stock=getStock();
+  if(!o.demo){
+    if(st==="Annulée" && !o.restocked){ o.items.forEach(i=>stock[i.id]=(stock[i.id]||0)+i.qty); o.restocked=true; }
+    else if(st!=="Annulée" && o.restocked){
+      const short=o.items.filter(i=>(stock[i.id]||0)<i.qty);
+      if(short.length){ toast("Stock insuffisant pour réactiver : "+short.map(i=>i.name).join(", ")); renderAll(); return; }
+      o.items.forEach(i=>stock[i.id]-=i.qty); o.restocked=false;
+    }
+  }
+  o.status=st; save(KEY_STOCK,stock); save(KEY_ORDERS,orders); renderAll();
+}
+function toggleDet(oid){ open.has(oid)?open.delete(oid):open.add(oid); renderOrders(); }
+
+/* ---------- rendu ---------- */
+function stockState(q,t){ return q<=0 ? ["Épuisé","p-bad"] : q<=t ? ["Stock faible","p-warn"] : ["OK","p-ok"]; }
+function renderAll(){ renderKpis(); renderCharts(); renderStock(); renderOrders(); }
+
+function renderKpis(){
+  const all=getOrders(), per=all.filter(inPeriod), valid=per.filter(o=>o.status!=="Annulée");
+  const rev=valid.reduce((s,o)=>s+o.total,0);
+  $("#kOrders").textContent=per.length;
+  const canc=per.filter(o=>o.status==="Annulée").length; $("#kOrdersSub").textContent=canc?`dont ${canc} annulée${canc>1?"s":""}`:"";
+  $("#kRev").textContent=fcfa(rev);
+  $("#kTodo").textContent=all.filter(o=>["Nouvelle","Confirmée","En livraison"].includes(o.status)).length;
+  $("#kAvg").textContent=valid.length?fcfa(rev/valid.length):"—";
+  // alerte stock
+  const s=getStock(), t=getThr(); const out=PRODUCTS.filter(p=>s[p.id]<=0), low=PRODUCTS.filter(p=>s[p.id]>0&&s[p.id]<=t[p.id]);
+  const a=$("#alert"); a.className="alert";
+  if(out.length||low.length){
+    a.classList.add("show"); if(out.length) a.classList.add("crit");
+    a.innerHTML=(out.length?`<b>Rupture de stock :</b> ${out.map(p=>esc(p.name)).join(", ")}. `:"")+(low.length?`<b>Stock faible :</b> ${low.map(p=>`${esc(p.name)} (${s[p.id]})`).join(", ")}.`:"");
+  }
+}
+
+function renderCharts(){
+  const valid=getOrders().filter(o=>o.status!=="Annulée");
+  // 7 jours
+  const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));return dayKey(d);});
+  const cnt=days.map(k=>valid.filter(o=>dayKey(o.createdAt)===k).length), mx=Math.max(1,...cnt);
+  $("#chDays").innerHTML=days.map((k,i)=>`<div class="col"><b>${cnt[i]||""}</b><i style="height:${Math.round(cnt[i]/mx*100)}%"></i><em>${new Date(k+"T12:00").toLocaleDateString("fr-FR",{weekday:"short"})}</em></div>`).join("");
+  const per=valid.filter(inPeriod);
+  // produits
+  const byP=PRODUCTS.map(p=>{let q=0,r=0;per.forEach(o=>o.items.forEach(i=>{if(i.id===p.id){q+=i.qty;r+=i.qty*i.price;}}));return {name:p.name,q,r};});
+  const mp=Math.max(1,...byP.map(x=>x.r));
+  $("#chProd").innerHTML=per.length?byP.map(x=>`<div class="hbar"><div class="l"><span>${esc(x.name)}</span><b>${fcfa(x.r)} · ${x.q} vendu${x.q>1?"s":""}</b></div><div class="track"><div class="fill" style="width:${x.r/mp*100}%"></div></div></div>`).join(""):'<div class="empty">Aucune vente sur cette période.</div>';
+  // communes
+  const z={}; per.forEach(o=>{const c=o.customer.commune||"Non précisée"; z[c]=(z[c]||0)+1;});
+  const zs=Object.entries(z).sort((a,b)=>b[1]-a[1]).slice(0,6), mz=Math.max(1,...zs.map(x=>x[1]));
+  $("#chZone").innerHTML=zs.length?zs.map(([c,n])=>`<div class="hbar"><div class="l"><span>${esc(c)}</span><b>${n}</b></div><div class="track"><div class="fill" style="width:${n/mz*100}%"></div></div></div>`).join(""):'<div class="empty">Aucune commande sur cette période.</div>';
+}
+
+function renderStock(){
+  const s=getStock(), t=getThr(), valid=getOrders().filter(o=>o.status!=="Annulée");
+  const week=new Date(); week.setHours(0,0,0,0); week.setDate(week.getDate()-6);
+  $("#stockBody").innerHTML=PRODUCTS.map(p=>{
+    const q=s[p.id], [lab,cls]=stockState(q,t[p.id]);
+    let sold=0, sold7=0;
+    valid.forEach(o=>o.items.forEach(i=>{ if(i.id!==p.id) return; if(inPeriod(o)) sold+=i.qty; if(new Date(o.createdAt)>=week) sold7+=i.qty; }));
+    const avg=sold7/7, auto=avg>0?Math.floor(q/avg):null;
+    return `<tr>
+      <td><b>${esc(p.name)}</b></td>
+      <td><div class="stk"><button onclick="addStock('${p.id}',-1)" aria-label="Retirer 1">−</button>
+        <input type="number" min="0" value="${q}" onchange="setStock('${p.id}',this.value)" aria-label="Stock ${esc(p.name)}">
+        <button onclick="addStock('${p.id}',1)" aria-label="Ajouter 1">+</button>
+        <button class="wide" onclick="addStock('${p.id}',10)">+10</button><button class="wide" onclick="addStock('${p.id}',50)">+50</button></div></td>
+      <td class="num"><input class="thr" type="number" min="0" value="${t[p.id]}" onchange="setThr('${p.id}',this.value)" aria-label="Seuil ${esc(p.name)}"></td>
+      <td><span class="pill ${cls}">${lab}</span></td>
+      <td class="num">${sold}</td>
+      <td class="num">${auto===null?"—":auto+" j"}</td>
+      <td class="num">${fcfa(q*p.price)}</td></tr>`;
+  }).join("");
+}
+
+function renderOrders(){
+  const q=$("#q").value.trim().toLowerCase(), fs=$("#fStatus").value;
+  const list=getOrders().filter(o=>(!fs||o.status===fs)&&(!q||[o.id,o.customer.name,o.customer.phone,o.customer.commune,o.customer.address].join(" ").toLowerCase().includes(q)));
+  $("#orderEmpty").hidden=list.length>0;
+  $("#orderBody").innerHTML=list.map(o=>{
+    const items=o.items.map(i=>`${esc(i.name)} ×${i.qty}`).join("<br>");
+    const phone=waPhone(o.customer.phone);
+    const wa=`https://wa.me/${phone}?text=${encodeURIComponent(`Bonjour ${o.customer.name}, votre commande ${o.id} chez IHAN : `)}`;
+    const isOpen=open.has(o.id), d=o.delivery||{};
+    const row=`<tr>
+      <td><b>${esc(o.id)}</b>${o.demo?'<span class="demo">démo</span>':""}</td>
+      <td>${fmtDT(o.createdAt)}</td>
+      <td>${esc(o.customer.name)}<br><span style="color:var(--muted)">${esc(o.customer.phone)}</span></td>
+      <td>${esc(o.customer.commune)}</td>
+      <td>${items}</td>
+      <td class="num"><b>${fcfa(o.total)}</b></td>
+      <td>${d.date?fmtD(d.date):"—"}<br><span style="color:var(--muted)">${esc(d.slot||"")}</span></td>
+      <td><select class="st s-${o.status.replace(' ','-')}" onchange="setStatus('${o.id}',this.value)" aria-label="Statut ${esc(o.id)}">${STATUSES.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></td>
+      <td style="white-space:nowrap"><button class="btn sm" onclick="toggleDet('${o.id}')" aria-expanded="${isOpen}">${isOpen?"Masquer":"Détails"}</button> <a class="btn sm" href="${wa}" target="_blank" rel="noopener">WhatsApp</a></td></tr>`;
+    const det=isOpen?`<tr class="det"><td colspan="9">
+      <b>Adresse :</b> ${esc(o.customer.address)}${o.customer.landmark?` — repère : ${esc(o.customer.landmark)}`:""}<br>
+      <b>Paiement :</b> ${esc(d.payment||"—")}${d.notes?`<br><b>Précisions :</b> ${esc(d.notes)}`:""}
+      ${d.geo?`<br><a href="https://www.google.com/maps?q=${d.geo.lat},${d.geo.lng}" target="_blank" rel="noopener" style="color:var(--terracotta);font-weight:600;">Voir la position GPS du client</a>`:""}</td></tr>`:"";
+    return row+det;
+  }).join("");
+}
+
+/* ---------- export CSV ---------- */
+$("#btnCsv").onclick=()=>{
+  const rows=[["N°","Date","Statut","Client","Téléphone","Commune","Adresse","Repère","Livraison","Créneau","Paiement","Articles","Total FCFA"]];
+  getOrders().forEach(o=>rows.push([o.id,fmtDT(o.createdAt),o.status,o.customer.name,o.customer.phone,o.customer.commune,o.customer.address,o.customer.landmark||"",o.delivery?.date||"",o.delivery?.slot||"",o.delivery?.payment||"",o.items.map(i=>`${i.name} x${i.qty}`).join(" + "),o.total]));
+  const csv="\ufeff"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})); a.download=`commandes-ihan-${dayKey(new Date())}.csv`; a.click();
+};
+
+/* ---------- démo ---------- */
+$("#btnDemo").onclick=()=>{
+  const names=["Aya Koné","Ibrahim Traoré","Mariam Diallo","Kouadio Yao","Fatou Bamba","Serge N'Guessan","Awa Coulibaly","Jean-Marc Ouattara"];
+  const zones=["Cocody","Marcory","Yopougon","Riviera","Koumassi","Abobo","Plateau","Treichville"];
+  const pay=["Espèces à la livraison","Orange Money","MTN Money","Moov Money"], slots=["Matin (8h – 12h)","Après-midi (12h – 16h)","Soir (16h – 19h)"];
+  const orders=getOrders(); let n=0;
+  for(let i=0;i<18;i++){
+    const when=new Date(); when.setDate(when.getDate()-Math.floor(Math.random()*9)); when.setHours(7+Math.floor(Math.random()*11),Math.floor(Math.random()*60));
+    const items=PRODUCTS.filter(()=>Math.random()<.45); if(!items.length) items.push(PRODUCTS[0]);
+    const lines=items.map(p=>({id:p.id,name:p.name,qty:1+Math.floor(Math.random()*(p.id==="evenement"?8:3)),price:p.price}));
+    const age=(Date.now()-when)/864e5, st=age>2?(Math.random()<.12?"Annulée":"Livrée"):["Nouvelle","Confirmée","En livraison"][Math.floor(Math.random()*3)];
+    orders.push({id:`DEMO-${String(++n).padStart(3,"0")}`,createdAt:when.toISOString(),status:st,restocked:false,demo:true,items:lines,total:lines.reduce((s,l)=>s+l.qty*l.price,0),
+      customer:{name:names[i%names.length],phone:"07 0"+(1000000+Math.floor(Math.random()*8999999)),commune:zones[Math.floor(Math.random()*zones.length)],address:"Quartier exemple, rue 12",landmark:""},
+      delivery:{date:dayKey(when),slot:slots[Math.floor(Math.random()*3)],payment:pay[Math.floor(Math.random()*4)],notes:"",geo:null}});
+  }
+  orders.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); save(KEY_ORDERS,orders); renderAll(); toast("18 commandes de démo ajoutées");
+};
+$("#btnClearDemo").onclick=()=>{ save(KEY_ORDERS,getOrders().filter(o=>!o.demo)); renderAll(); toast("Données de démo supprimées"); };
+
+/* ---------- filtres + synchro ---------- */
+$("#fStatus").innerHTML+=STATUSES.map(s=>`<option>${s}</option>`).join("");
+$("#q").oninput=renderOrders; $("#fStatus").onchange=renderOrders;
+$("#period").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; period=+b.dataset.p; document.querySelectorAll("#period button").forEach(x=>x.classList.toggle("on",x===b)); renderAll();});
+window.addEventListener("storage",ev=>{ if(ev.key===KEY_STOCK||ev.key===KEY_ORDERS||ev.key===KEY_META) renderAll(); });
+if(!localStorage.getItem(KEY_STOCK)) save(KEY_STOCK,DEFAULT_STOCK);
+renderAll();
+</script>
+</body>
+</html>
